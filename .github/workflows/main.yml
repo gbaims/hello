@@ -11,7 +11,7 @@ jobs:
         id: meta
         with:
           images: |
-            ${{ vars.REGISTRY_HOST }}/${{ github.repository }}
+            ${{ vars.REGISTRY_HOST }}/${{ github.event.repository.name }}
           tags: |
             type=sha,prefix={{branch}}-
           flavor: |
@@ -27,14 +27,9 @@ jobs:
         with:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+      - uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-host: ${{ vars.SSH_HOST }}
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - env:
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-        run: |
-          ssh -t ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}
-          sed -i 's|image:.*$|image: "${{ vars.REGISTRY_HOST }}/${{ github.repository }}:${{ fromJSON(steps.meta.outputs.json).tags[0] }}"|g' {{ vars.SSH_PATH }}
-          docker login -u ${{ vars.REGISTRY_USERNAME }} -p "$REGISTRY_PASSWORD" ${{ vars.REGISTRY_HOST }} 
-          docker compose up -d ${{ github.event.repository.name }}
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: deploy.sh ${{ github.event.repository.name }} ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
