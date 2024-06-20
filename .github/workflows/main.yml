@@ -32,4 +32,4 @@ jobs:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: deploy.sh ${{ github.event.repository.name }} ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          script: bin/deploy.sh ${{ github.event.repository.name }} ${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
