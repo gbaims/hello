@@ -3,7 +3,7 @@ import Fastify from 'fastify';
 const fastify = Fastify({logger: true});
 
 fastify.get('/hello', async (_, reply) => {
-    reply.send('hello world!');
+    reply.send('hello world!!');
 })
 
 const port = process.env.PORT;
